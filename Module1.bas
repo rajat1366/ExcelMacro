@@ -1,4 +1,13 @@
 Attribute VB_Name = "Module1"
+Sub init()
+    Call DeleteTopAndBottomData
+    Call SortBoxNo
+    Call FourColumnFormat
+    Call MergeBoxNo
+
+End Sub
+
+
 Sub DeleteTopAndBottomData()
 Attribute DeleteTopAndBottomData.VB_ProcData.VB_Invoke_Func = "P\n14"
 '
@@ -6,16 +15,17 @@ Attribute DeleteTopAndBottomData.VB_ProcData.VB_Invoke_Func = "P\n14"
 '
 ' Keyboard Shortcut: Ctrl+Shift+P
 '
+' Deleting Extra Data on top
     Range("A1:F8").Select
     Range("F8").Activate
     Selection.EntireRow.Delete
     
-    
+' Deleting ECIL AND YEAR Columns
     Range("D:D,E:E").Select
     Range("E1").Activate
     Selection.Delete Shift:=xlToLeft
     
-    
+' Deleting Extra Data at Bottom
     lastRow = ActiveSheet.Cells(Rows.Count, "A").End(xlUp).Row
     thirdLastRow = lastRow - 2
     Range("A" & thirdLastRow & ":C" & lastRow).Select
