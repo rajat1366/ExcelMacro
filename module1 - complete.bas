@@ -100,6 +100,9 @@ Sub FourColumnFormat()
          
     Loop
             
+    Call ResizeColumnWidth
+End Sub
+Sub ResizeColumnWidth()
     Columns("A:A").EntireColumn.AutoFit
     Columns("B:B").EntireColumn.AutoFit
     Columns("D:D").EntireColumn.AutoFit
@@ -109,7 +112,6 @@ Sub FourColumnFormat()
     Columns("J:J").EntireColumn.AutoFit
     Columns("K:K").EntireColumn.AutoFit
 End Sub
-
 Sub MergeBoxNo()
 '
 ' MergeBoxNo Macro
