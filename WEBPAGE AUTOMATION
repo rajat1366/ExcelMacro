@@ -1,0 +1,171 @@
+
+Enum READYSTATE
+    READYSTATE_UNINITIALIZED = 0
+    READYSTATE_LOADING = 1
+    READYSTATE_LOADED = 2
+    READYSTATE_INTERACTIVE = 3
+    READYSTATE_COMPLETE = 4
+End Enum
+Sub BoxUnitCount()
+
+
+Set ie = CreateObject("InternetExplorer.Application")
+ie.Visible = True
+ie.Navigate "http://www.genesys.nic.in/etsweb"
+
+Do While (ie.Busy Or ie.READYSTATE <> READYSTATE.READYSTATE_COMPLETE)
+  DoEvents
+Loop
+
+ie.document.All("txtuser").Value = "ECSEDT1001"
+ie.document.All("txtpass").Value = "Temppass12"
+ie.document.All("btnlogin").Click
+
+Do While (ie.Busy Or ie.READYSTATE <> READYSTATE.READYSTATE_COMPLETE)
+  DoEvents
+Loop
+
+Dim oHtml       As HTMLDocument
+Dim oElement    As HTMLAnchorElement
+
+Set oHtml = ie.document
+
+oHtml.getElementById("ctl00_HyperLink8").Click
+
+Do While (ie.Busy Or ie.READYSTATE <> READYSTATE.READYSTATE_COMPLETE)
+  DoEvents
+Loop
+
+lastRow = ActiveSheet.Range("A1").End(xlDown).row
+Dim BoxNo As String
+Dim BoxUnitCount As String
+Counter = 1
+For Counter = 1 To lastRow
+
+        ie.document.All("ctl00_ContentPlaceHolder1_txtWarehouse").Value = "2"
+        ie.document.All("ctl00_ContentPlaceHolder1_ddlUnitType").Value = "Ballot"
+        ie.document.All("ctl00_ContentPlaceHolder1_txtBoxNo").Value = Cells(Counter, 1).Value
+        ie.document.All("ctl00_ContentPlaceHolder1_Button1").Click
+        
+        Do While (ie.Busy Or ie.READYSTATE <> READYSTATE.READYSTATE_COMPLETE)
+          DoEvents
+        Loop
+        
+        
+        Set oHtml = ie.document
+        
+        If ie.document.getElementById("ctl00_ContentPlaceHolder1_Label1").innerHTML <> "" Then
+                            
+                        
+                            BoxNo = ie.document.getElementsByTagName("td").Item(1).innerHTML
+                             If BoxNo = Cells(Counter, 1) Then
+                                     Cells(Counter, 2).Value = ie.document.getElementById("ctl00_ContentPlaceHolder1_Label1").innerHTML
+                                         BoxUnitCount = ie.document.getElementById("ctl00_ContentPlaceHolder1_Label1").innerHTML
+                                         TestString = "Total No of Records: 10"
+                                             If BoxUnitCount = TestString Then
+                                                 Cells(Counter, 3).Value = "RIGHT"
+                                             Else
+                                                 Cells(Counter, 3).Value = "WRONG"
+                                             End If
+                                         
+                                End If
+                       
+                
+            
+        End If
+        
+         
+Next Counter
+
+End Sub
+Sub StickerPrinting()
+    
+    Set ie = CreateObject("InternetExplorer.Application")
+    ie.Visible = True
+    ie.Navigate "http://www.genesys.nic.in/etsweb"
+    
+    Do While (ie.Busy Or ie.READYSTATE <> READYSTATE.READYSTATE_COMPLETE)
+     DoEvents
+    Loop
+    
+    ie.document.All("txtuser").Value = "ECSEDT1001"
+    ie.document.All("txtpass").Value = "Temppass12"
+    ie.document.All("btnlogin").Click
+    
+    Do While (ie.Busy Or ie.READYSTATE <> READYSTATE.READYSTATE_COMPLETE)
+        DoEvents
+    Loop
+    
+    Dim oHtml       As HTMLDocument
+    Dim oElement    As HTMLAnchorElement
+    
+    Set oHtml = ie.document
+    
+    oHtml.getElementById("ctl00_HyperLink8").Click
+    
+    Do While (ie.Busy Or ie.READYSTATE <> READYSTATE.READYSTATE_COMPLETE)
+      DoEvents
+    Loop
+    
+    
+    Dim BoxNo As String
+    Dim BoxUnitCount As String
+    TestString = "Total No of Records: 10"
+    
+    startBoxNo = 20000
+    EndBoxNo = 20003
+   
+    
+    For Counter = startBoxNo To EndBoxNo
+            ie.document.All("ctl00_ContentPlaceHolder1_txtWarehouse").Value = "11"
+            ie.document.All("ctl00_ContentPlaceHolder1_ddlUnitType").Value = "Control"
+            ie.document.All("ctl00_ContentPlaceHolder1_txtBoxNo").Value = Counter
+            ie.document.All("ctl00_ContentPlaceHolder1_Button1").Click
+            
+            Do While (ie.Busy Or ie.READYSTATE <> READYSTATE.READYSTATE_COMPLETE)
+              DoEvents
+            Loop
+            
+            Set oHtml = ie.document
+            If ie.document.getElementById("ctl00_ContentPlaceHolder1_Label1").innerHTML <> "" Then
+                    Dim BoxTable As Object
+                    Set BoxTable = ie.document.getElementById("ctl00_ContentPlaceHolder1_GridView1")
+                    If Not (BoxTable Is Nothing) Then
+                         
+                                BoxNo = oHtml.getElementsByTagName("td").Item(1).innerHTML
+                                If BoxNo = Counter Then
+                                    
+                                        BoxUnitCount = ie.document.getElementById("ctl00_ContentPlaceHolder1_Label1").innerHTML
+                                        If BoxUnitCount = TestString Then
+                                              
+                                            Dim i As Integer, j As Integer, row As Integer
+                                             row = 3
+                                             
+                                            Set tbl = oHtml.getElementById("ctl00_ContentPlaceHolder1_GridView1")
+                                            Set tr_coll = tbl.getElementsByTagName("tr")
+                                                For Each tr In tr_coll
+                                                    
+                                                    col = 16
+                                                    Set td_col = tr.getElementsByTagName("td")
+                                        
+                                                    For Each td In td_col
+                                                        Cells(row, col).Value = td.innerText
+                                                            
+                                                        col = col + 1
+                                                    Next
+                                                    row = row + 1
+                                                Next
+                                                 Application.ActivePrinter = _
+                                                    "HP LaserJet Pro MFP M125-M126 PCLmS (Copy 2) on Ne02:"
+                                                 ExecuteExcel4Macro _
+                                                    "PRINT(1,,,1,,,,,,,,2,""HP LaserJet Pro MFP M125-M126 PCLmS (Copy 2) on Ne02:"",,TRUE,,FALSE)"
+                                                
+                                          End If
+                                 End If
+                        End If
+                
+            End If
+        Next Counter
+
+End Sub
+
