@@ -112,13 +112,22 @@ Sub StickerPrinting()
     Dim BoxUnitCount As String
     TestString = "Total No of Records: 10"
     
-    startBoxNo = 20000
-    EndBoxNo = 20003
+    
+    wareHouse = 2
+    unitType = "Ballot"    ' Control or Ballot
+    startBoxNo = 25000
+    EndBoxNo = 25003
    
+    If unitType = "Control" Then
+        Cells(1, 2).Value = "                 CONTROL UNIT CU 7530"
+    Else
+        Cells(1, 2).Value = "                 BALLOT UNIT BU 7415"
+    
+    End If
     
     For Counter = startBoxNo To EndBoxNo
-            ie.document.All("ctl00_ContentPlaceHolder1_txtWarehouse").Value = "11"
-            ie.document.All("ctl00_ContentPlaceHolder1_ddlUnitType").Value = "Control"
+            ie.document.All("ctl00_ContentPlaceHolder1_txtWarehouse").Value = wareHouse
+            ie.document.All("ctl00_ContentPlaceHolder1_ddlUnitType").Value = unitType
             ie.document.All("ctl00_ContentPlaceHolder1_txtBoxNo").Value = Counter
             ie.document.All("ctl00_ContentPlaceHolder1_Button1").Click
             
