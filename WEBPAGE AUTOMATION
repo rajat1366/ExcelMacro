@@ -177,4 +177,88 @@ Sub StickerPrinting()
         Next Counter
 
 End Sub
+Sub BulkShift()
+    
+    Set IE = CreateObject("InternetExplorer.Application")
+    IE.Visible = True
+    IE.Navigate "http://www.genesys.nic.in/etsweb"
+    
+    Do While (IE.Busy Or IE.READYSTATE <> READYSTATE.READYSTATE_COMPLETE)
+     DoEvents
+    Loop
+    
+    IE.document.All("txtuser").Value = "ECSEDT1001"
+    IE.document.All("txtpass").Value = "Temppass12"
+    IE.document.All("btnlogin").Click
+    
+    Do While (IE.Busy Or IE.READYSTATE <> READYSTATE.READYSTATE_COMPLETE)
+        DoEvents
+    Loop
+    
+    Dim oHtml       As HTMLDocument
+    Dim oElement    As HTMLAnchorElement
+    
+    Set oHtml = IE.document
+    
+    oHtml.getElementById("ctl00_hlkbulkshift").Click
+    
+    Do While (IE.Busy Or IE.READYSTATE <> READYSTATE.READYSTATE_COMPLETE)
+      DoEvents
+    Loop
+    
+    unitType = "Ballot"  'Control or Ballot
+    FromWareHouse = 1271
+    ToWareHouse = 1289
+    '<option value="1057">1-Warehouse</option>
+    '<option value="1271">2-Warehouse</option>
+    '<option value="1272">3-Warehouse</option>
+    '<option value="1289">4-Warehouse</option>
+    '<option value="2418">5-EVM Repair Room</option>
+    '<option value="4964">11-Warehouse</option>
+    
+    
+    
+    IE.document.All("ctl00_ContentPlaceHolder1_ddlUnitType").Value = unitType
+    IE.document.All("ctl00_ContentPlaceHolder1_ddlFromWarehouse").Value = FromWareHouse
+    IE.document.All("ctl00_ContentPlaceHolder1_ddlToWarehouse").Value = ToWareHouse
+    IE.document.All("ctl00_ContentPlaceHolder1_btnShowGrid").Click
+            
+     Do While (IE.Busy Or IE.READYSTATE <> READYSTATE.READYSTATE_COMPLETE)
+          DoEvents
+     Loop
+     
+    Dim tbl As HTMLTable
+    
+     
+    Dim BoxTable As Object
+    Set BoxTable = IE.document.getElementById("ctl00_ContentPlaceHolder1_GridView1")
+    
+    If Not (BoxTable Is Nothing) Then
+            Dim i As Integer, j As Integer, row As Integer
+                row = 1
+                                             
+                 Set tbl = oHtml.getElementById("ctl00_ContentPlaceHolder1_GridView1")
+                 Set tr_coll = tbl.getElementsByTagName("tr")
+                 
+                 'MsgBox tbl.Rows.Length
+                         For Each tr In tr_coll
+                                                    
+                                 col = 1
+                                 Set td_col = tr.getElementsByTagName("td")
+                                        
+                                        For Each td In td_col
+                                              Cells(row, col).Value = td.innerText
+                                              col = col + 1
+                                        Next
+                                 row = row + 1
+                          Next
+            Set oHtml = IE.document
+          
+            IE.contentDocument.script.eval ("var i = 5; alert(i);")
+            
+    End If
+    
+    
+
+End Sub
 
